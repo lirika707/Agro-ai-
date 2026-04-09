@@ -1,0 +1,5 @@
+{
+  "name": "AgroSmart AI",
+  "description": "AI-powered farming platform for plant diagnosis, marketplace, and community.",
+  "requestFramePermissions": ["camera"]
+}

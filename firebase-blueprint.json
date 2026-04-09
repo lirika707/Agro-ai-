@@ -1,0 +1,77 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile information",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "displayName": { "type": "string" },
+        "role": { "type": "string", "enum": ["farmer", "expert"] },
+        "isPremium": { "type": "boolean" }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "AIHistory": {
+      "title": "AIHistory",
+      "description": "Record of an AI chat message",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "role": { "type": "string", "enum": ["user", "model"] },
+        "text": { "type": "string" },
+        "image": { "type": "string", "description": "Base64 encoded image" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "role", "text", "timestamp"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Marketplace product listing",
+      "type": "object",
+      "properties": {
+        "sellerId": { "type": "string" },
+        "name": { "type": "string" },
+        "price": { "type": "number" },
+        "description": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "category": { "type": "string" },
+        "location": { "type": "string" },
+        "condition": { "type": "string" },
+        "phone": { "type": "string" }
+      },
+      "required": ["sellerId", "name", "price", "category", "location"]
+    },
+    "Report": {
+      "title": "Report",
+      "description": "User report for a product",
+      "type": "object",
+      "properties": {
+        "productId": { "type": "string" },
+        "reporterId": { "type": "string" },
+        "reason": { "type": "string" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["productId", "reporterId", "reason", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "User" },
+      "description": "User profiles"
+    },
+    "/ai_history/{historyId}": {
+      "schema": { "$ref": "AIHistory" },
+      "description": "AI analysis history"
+    },
+    "/products/{productId}": {
+      "schema": { "$ref": "Product" },
+      "description": "Marketplace products"
+    },
+    "/reports/{reportId}": {
+      "schema": { "$ref": "Report" },
+      "description": "User reports for products"
+    }
+  }
+}

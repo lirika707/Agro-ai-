@@ -1,0 +1,113 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && (
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+        (request.auth.token.email == "nterra558@gmail.com" && request.auth.token.email_verified == true)
+      );
+    }
+
+    // Users collection
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId) && 
+        request.resource.data.role == (request.auth.token.email == "nterra558@gmail.com" ? 'admin' : 'user');
+      allow update: if isOwner(userId) && 
+        request.resource.data.role == resource.data.role; // Cannot change own role
+      allow update, delete: if isAdmin();
+    }
+
+    // AI History collection
+    match /ai_history/{historyId} {
+      allow read: if isAuthenticated() && request.auth.uid == resource.data.userId;
+      allow create: if isAuthenticated() && 
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.role in ['user', 'model'] &&
+        request.resource.data.text is string && request.resource.data.text.size() < 10000 &&
+        (
+          !('image' in request.resource.data) || 
+          request.resource.data.image == null || 
+          (request.resource.data.image is string && request.resource.data.image.size() < 1000000)
+        ) &&
+        request.resource.data.timestamp is string;
+    }
+
+    // Products collection
+    match /products/{productId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && 
+        request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() < 100 &&
+        request.resource.data.price is number && request.resource.data.price >= 0 &&
+        request.resource.data.description is string && request.resource.data.description.size() < 1000 &&
+        (
+          (request.resource.data.imageUrl is string && (request.resource.data.imageUrl.matches("^https?://.*") || request.resource.data.imageUrl.matches("^data:image/.*")) && request.resource.data.imageUrl.size() < 1000000) ||
+          (request.resource.data.imageUrls is list && request.resource.data.imageUrls.size() > 0 && request.resource.data.imageUrls.size() <= 10)
+        ) &&
+        request.resource.data.category is string &&
+        request.resource.data.location is string && request.resource.data.location.size() > 0 &&
+        request.resource.data.sellerId == request.auth.uid;
+      allow update: if isAuthenticated() && (
+        (request.auth.uid == resource.data.sellerId &&
+          request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() < 100 &&
+          request.resource.data.price is number && request.resource.data.price >= 0 &&
+          request.resource.data.description is string && request.resource.data.description.size() < 1000 &&
+          (
+            (request.resource.data.imageUrl is string && (request.resource.data.imageUrl.matches("^https?://.*") || request.resource.data.imageUrl.matches("^data:image/.*")) && request.resource.data.imageUrl.size() < 1000000) ||
+            (request.resource.data.imageUrls is list && request.resource.data.imageUrls.size() > 0 && request.resource.data.imageUrls.size() <= 10)
+          ) &&
+          request.resource.data.category is string &&
+          request.resource.data.location is string && request.resource.data.location.size() > 0 &&
+          request.resource.data.sellerId == resource.data.sellerId) ||
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['views']) &&
+         request.resource.data.views == resource.data.get('views', 0) + 1)
+      );
+      allow delete: if isAuthenticated() && request.auth.uid == resource.data.sellerId;
+
+      // Reviews subcollection
+      match /reviews/{reviewId} {
+        allow read: if isAuthenticated();
+        allow create: if isAuthenticated() && 
+          request.resource.data.rating is number && request.resource.data.rating >= 1 && request.resource.data.rating <= 5 &&
+          request.resource.data.comment is string && request.resource.data.comment.size() <= 1000 &&
+          request.resource.data.userId == request.auth.uid;
+        allow update, delete: if isAuthenticated() && request.auth.uid == resource.data.userId;
+      }
+    }
+
+    // Reports collection
+    match /reports/{reportId} {
+      allow read: if false; // Only admins should read reports (not implemented yet)
+      allow create: if isAuthenticated() && 
+        request.resource.data.productId is string &&
+        request.resource.data.reporterId == request.auth.uid &&
+        request.resource.data.reason is string && request.resource.data.reason.size() > 0 && request.resource.data.reason.size() <= 1000 &&
+        request.resource.data.createdAt is number;
+    }
+
+    // Questions collection
+    match /questions/{questionId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && 
+        request.resource.data.category in ['Plant Diseases', 'Marketplace', 'Tips & Tricks', 'General'];
+
+      // Answers subcollection
+      match /answers/{answerId} {
+        allow read: if isAuthenticated();
+        allow create: if isAuthenticated();
+        allow update: if isAuthenticated() && request.auth.uid == resource.data.userId;
+        allow delete: if isAuthenticated() && request.auth.uid == resource.data.userId;
+      }
+    }
+  }
+}
