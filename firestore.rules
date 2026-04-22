@@ -41,6 +41,7 @@ service cloud.firestore {
           (request.resource.data.image is string && request.resource.data.image.size() < 1000000)
         ) &&
         request.resource.data.timestamp is string;
+      allow delete: if isAuthenticated() && request.auth.uid == resource.data.userId;
     }
 
     // Products collection
@@ -100,6 +101,7 @@ service cloud.firestore {
       allow read: if isAuthenticated();
       allow create: if isAuthenticated() && 
         request.resource.data.category in ['Plant Diseases', 'Marketplace', 'Tips & Tricks', 'General'];
+      allow update: if isAuthenticated() && request.auth.uid == resource.data.userId;
 
       // Answers subcollection
       match /answers/{answerId} {

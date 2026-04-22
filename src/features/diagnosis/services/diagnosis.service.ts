@@ -65,6 +65,7 @@ export const DiagnosisService = {
           plantName: data.plantName,
           diseaseName: data.diseaseName,
           scientificName: data.scientificName,
+          timestamp: data.timestamp,
         };
       });
       callback(historyMessages);

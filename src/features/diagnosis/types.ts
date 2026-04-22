@@ -5,6 +5,7 @@ export interface Message {
   plantName?: string;
   diseaseName?: string;
   scientificName?: string;
+  timestamp: string | any;
 }
 
 export enum OperationType {

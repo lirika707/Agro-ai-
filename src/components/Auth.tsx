@@ -3,6 +3,7 @@ import { signInWithPopup } from 'firebase/auth';
 import { auth, googleProvider } from '../services/firebase';
 import Layout from './Layout';
 import { useI18n } from '../features/language/useLanguage';
+import EGINLogo from './EGINLogo';
 
 export default function Auth() {
   const [error, setError] = useState<string | null>(null);
@@ -21,7 +22,7 @@ export default function Auth() {
   return (
     <Layout>
       <div className="flex flex-col items-center justify-center py-12">
-        <h1 className="text-4xl font-semibold mb-8 text-olive">{t('AgroSmart AI')}</h1>
+        <EGINLogo className="mb-8 scale-150" />
         {error && <p className="text-red-500 mb-4">{error}</p>}
         <button
           onClick={handleSignIn}

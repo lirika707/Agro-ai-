@@ -11,6 +11,8 @@ export interface UserProfile {
   country: CountryCode;
   region: string;
   language: LanguageCode;
+  phone?: string;
+  bio?: string;
   role: UserRole;
   createdAt: number;
   updatedAt: number;

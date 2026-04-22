@@ -1,8 +1,8 @@
 import React from 'react';
 import { Home, Stethoscope, ShoppingBag, MessageSquare, User, ShieldCheck } from 'lucide-react';
 import { useI18n } from '../features/language/useLanguage';
-import LanguageSwitcher from './LanguageSwitcher';
 import AdminGuard from '../features/profile/components/AdminGuard';
+import EGINLogo from './EGINLogo';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -17,7 +17,7 @@ export default function Layout({ children, activeTab, onNavigate }: LayoutProps)
     { id: 'home', label: t('Home'), icon: <Home size={24} /> },
     { id: 'diagnosis', label: t('Diagnosis'), icon: <Stethoscope size={24} /> },
     { id: 'marketplace', label: t('Market'), icon: <ShoppingBag size={24} /> },
-    { id: 'forum', label: t('Chats'), icon: <MessageSquare size={24} /> },
+    { id: 'forum', label: t('Community'), icon: <MessageSquare size={24} /> },
     { id: 'profile', label: t('Profile'), icon: <User size={24} /> },
   ];
 
@@ -27,7 +27,7 @@ export default function Layout({ children, activeTab, onNavigate }: LayoutProps)
       {onNavigate && (
         <aside className="hidden md:flex w-64 bg-white border-r border-gray-100 flex-col p-6 fixed h-full">
           <div className="mb-10 px-2">
-            <h1 className="text-2xl font-bold text-[#2D6A4F]">{t('AgroSmart AI')}</h1>
+            <EGINLogo />
           </div>
           
           <nav className="flex-grow space-y-2">
@@ -58,7 +58,6 @@ export default function Layout({ children, activeTab, onNavigate }: LayoutProps)
           </nav>
 
           <div className="mt-auto pt-6 border-t border-gray-100">
-            <LanguageSwitcher />
           </div>
         </aside>
       )}
@@ -68,8 +67,7 @@ export default function Layout({ children, activeTab, onNavigate }: LayoutProps)
         <div className={`${activeTab === 'diagnosis' ? 'w-full' : 'max-w-5xl mx-auto'} p-4 md:p-10`}>
           {/* Mobile Header */}
           <div className="md:hidden flex justify-between items-center mb-6">
-            <h1 className="text-xl font-bold text-[#2D6A4F]">{t('AgroSmart AI')}</h1>
-            <LanguageSwitcher />
+            <EGINLogo />
           </div>
           
           <div className="bg-white rounded-[40px] shadow-sm border border-gray-100 p-6 md:p-10 min-h-[calc(100vh-120px)]">

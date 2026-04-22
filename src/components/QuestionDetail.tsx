@@ -55,21 +55,36 @@ export default function QuestionDetail({ questionId, onBack }: { questionId: str
   if (!question) return <div>{t('Loading...')}</div>;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-4xl mx-auto">
       <button onClick={onBack} className="text-[#2D6A4F] font-bold flex items-center gap-2 hover:underline transition-all">
         <span>←</span> {t('Back to Forum')}
       </button>
       
-      <div className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm">
-        <h2 className="text-2xl font-bold text-[#2D6A4F] mb-3">{question.title}</h2>
-        <p className="text-gray-600 leading-relaxed">{question.description}</p>
-        <div className="mt-4 flex items-center gap-3 text-xs text-gray-400">
-          <div className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center">
-            <span className="text-[10px] font-bold text-gray-500">{question.userName?.[0]}</span>
+      <div className="bg-white rounded-[32px] border border-gray-100 shadow-sm overflow-hidden">
+        {question.imageUrls && question.imageUrls.length > 0 && (
+          <img src={question.imageUrls[0]} alt="Topic" className="w-full h-64 object-cover" />
+        )}
+        <div className="p-8">
+          <h2 className="text-3xl font-bold text-gray-900 mb-6">{question.title}</h2>
+          
+          {/* Metadata Bar */}
+          <div className="flex flex-wrap items-center gap-3 mb-6 pb-6 border-b border-gray-100">
+            <div className="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-full">
+              <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center text-[10px] font-bold text-gray-600">
+                {question.userName?.[0]?.toUpperCase()}
+              </div>
+              <span className="text-sm font-bold text-gray-700">{question.userName || 'Anonymous'}</span>
+            </div>
+            
+            <div className="text-sm text-gray-500">
+              {new Date(question.timestamp).toLocaleDateString()}
+            </div>
+            <div className="text-sm font-bold text-[#2D6A4F] bg-green-50 px-3 py-1 rounded-full">
+              {question.category}
+            </div>
           </div>
-          <span>{question.userName}</span>
-          <span>•</span>
-          <span>{new Date(question.timestamp).toLocaleDateString()}</span>
+
+          <p className="text-gray-800 leading-relaxed text-lg">{question.description}</p>
         </div>
       </div>
 
